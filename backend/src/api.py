@@ -137,6 +137,40 @@ def edit_drink_by_id(*args, **kwargs):
     })
 
 
+'''
+Route handler for deleting drink.
+Requires 'delete:drinks' permission.
+'''
+@app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(*args, **kwargs):
+    # get id from kwargs
+    id = kwargs['id']
+
+    # get drink by id
+    drink = Drink.query.filter_by(id=id).one_or_none()
+
+    # if drink not found
+    if drink is None:
+        abort(404)
+
+    try:
+        # delete drink from database
+        drink.delete()
+    except Exception as e:
+        # catch exceptions
+        print('EXCEPTION: ', str(e))
+
+        # server error
+        abort(500)
+
+    # return status and deleted drink id
+    return jsonify({
+        'success': True,
+        'delete': id
+    })
+
+
 # Error Handling
 '''
 Error handling for resource not found
