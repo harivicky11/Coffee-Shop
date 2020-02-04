@@ -35,3 +35,17 @@ def get_drinks():
         'success': True,
         'drinks': drinks_short
     })
+
+# Error Handling
+
+
+'''
+Error handling for resource not found
+'''
+@app.errorhandler(404)
+def resource_not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
