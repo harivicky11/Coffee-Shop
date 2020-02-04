@@ -61,8 +61,35 @@ def get_drinks_detail(jwt):
     })
 
 
-# Error Handling
+'''
+Route handler for adding new drink.
+Requires 'post:drinks' permission.
+'''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def add_drink(jwt):
+    # get the drink info from request
+    body = request.get_json()
+    title = body['title']
+    recipe = body['recipe']
 
+    # create a new drink
+    drink = Drink(title=title, recipe=json.dumps(recipe))
+
+    try:
+        # add drink to the database
+        drink.insert()
+    except Exception as e:
+        print('ERROR: ', str(e))
+        abort(422)
+
+    return jsonify({
+        "success": True,
+        "drinks": drink.long()
+    })
+
+
+# Error Handling
 '''
 Error handling for resource not found
 '''
