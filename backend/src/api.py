@@ -89,6 +89,54 @@ def add_drink(jwt):
     })
 
 
+'''
+Route handler for editing existing drink.
+Requires 'patch:drinks' permission.
+'''
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def edit_drink_by_id(*args, **kwargs):
+    # get id from kwargs
+    id = kwargs['id']
+
+    # get drink by id
+    drink = Drink.query.filter_by(id=id).one_or_none()
+
+    # if drink not found
+    if drink is None:
+        abort(404)
+
+    # get request body
+    body = request.get_json()
+
+    # update title if present in body
+    if 'title' in body:
+        drink.title = body['title']
+
+    # update recipe if present in body
+    if 'recipe' in body:
+        drink.recipe = json.dumps(body['recipe'])
+
+    try:
+        # update drink in database
+        drink.insert()
+    except Exception as e:
+        # catch exceptions
+        print('EXCEPTION: ', str(e))
+
+        # Bad Request
+        abort(400)
+
+    # array containing .long() representation
+    drink = [drink.long()]
+
+    # return drink to view
+    return jsonify({
+        'success': True,
+        'drinks': drink
+    })
+
+
 # Error Handling
 '''
 Error handling for resource not found
