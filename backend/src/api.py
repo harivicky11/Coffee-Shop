@@ -36,8 +36,32 @@ def get_drinks():
         'drinks': drinks_short
     })
 
-# Error Handling
 
+'''
+Route handler for getting detailed representation of all drinks.
+Requires 'get:drinks-detail' permission.
+'''
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(jwt):
+    # get all drinks and format using .long()
+    drinks = Drink.query.all()
+
+    # 404 if no drinks found
+    if len(drinks) == 0:
+        abort(404)
+
+    # format using .long()
+    drinks_long = [drink.long() for drink in drinks]
+
+    # return drinks
+    return jsonify({
+        'success': True,
+        'drinks': drinks_long
+    })
+
+
+# Error Handling
 
 '''
 Error handling for resource not found
